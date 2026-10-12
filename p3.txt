@@ -1,7 +1,59 @@
 Hash table:
+Memory: Each component type map only stores entities that have that specific component. So if an entity does not have
+that component, it does not take up space. However, each entry does take up more bytes than normal.
+Storing a value in a hash table requires a key, pointer, and other bookkeeping related to new.
+
+Speed: Is O(1) on average and O(n) in the worst case for search, insertion and deletion. However, since
+hash tables don't have contiguous data, there would be more cache misses that are not represented in the Big-O.
+
+Maintenance: O(1) on average and O(n) in the worst case for insertion and deletion. For those O(n)
+specifically in an addition, it might cause a rehash (to a bigger bucket array). This might cause a lag spike
+to occur. When removing a component, the moved entity's index has to be updated, which needs a reverse lookup
+or an O(n) search.
 
 Map:
+Memory: Similar to the hash table, if the entity does not have that specific component it does not get an empty node in memory.
+The map needs to store the parent pointer, the left pointer, the right pointer, its own key and its value.
+Plus extra bookkeeping with new similar to the hash table. So each entry is about the same size as a hash table entry.
+
+Speed: Access, Search, Insertion and Deletion are O(log(n)) in average time and O(log(n)) in the worst case. However,
+there is still a cache issue because as you go down the tree, it jumps to a different area in memory, thus creating
+more cache misses compared to the hash table.
+
+Maintenance: Insertion and Deletion are O(log(n)) in average and worst case. It doesn't have to rehash the full table,
+but it might have to move around specific nodes to rebalance the binary tree. So when you remove/insert a value, the
+map needs to update accordingly so the node can be correctly placed in the tree's overall structure. Since this only
+moves a few nodes, there are no big lag spikes like the hash table's rehash. Same as the hash table, removing a
+component needs a reverse lookup or an O(n) search to update the moved entity's index.
 
 Sparse mapping 1:
+Memory: There are N*K slots. An entity without a component does cost memory even if it is empty (-1). Each slot only stores
+its value (no need for pointers or other bookkeeping). While it is much smaller than the other options, some entries
+will be empty. So if the ratio of non-empty components outweighs the size cost of map/hash table, then sparse mapping would be better on
+memory.
+
+Speed: Lookups are O(1) for m[entity][component]. Also all the memory for a specific entity is all in one place in memory,
+m[entity][components], they are all together (contiguous). If you wanted to look up all component 1 information in each entity then
+each component 1 is K slots apart. If the amount of components is less than the size of the cache line, then it would result in
+fewer cache misses. As K increases more and more cache misses would occur, eventually having a cache miss for every lookup. I.e. Fast
+reading for all components for one entity, but slower for looping one component across all entities.
+
+Maintenance: Adding a new entity (a new row) through push_back is amortized O(1). If the vector is full, it copies the whole
+table into a bigger block, which might cause a lag spike. When removing a component, you set it to empty (-1) O(1). It does need
+a reverse lookup or an O(n) search to find which entity got moved into the gap.
 
 Sparse mapping 2:
+Memory: There are K*N slots. Same memory as sparse mapping 1, an entity without a component does cost memory even if it is empty (-1)
+(just the layout differs). Each slot only stores its value (no need for pointers or other bookkeeping). While it is much smaller than
+the other options, some entries will be empty. So if the ratio of non-empty components outweighs the size cost of map/hash table,
+then sparse mapping would be better on memory.
+
+Speed: Lookups are O(1) for m[component][entity]. Also all the memory for a specific component is all in one place in memory,
+m[component][entities], they are all together (contiguous). If you wanted to look up all component information for entity 1,
+then each of its slots is in a different vector (K separate places in memory). Since N (the number of entities) is large and
+grows at runtime, this would usually be a cache miss for each component (about K misses). I.e. Fast
+reading for one component across all entities, but slower for reading all components of one entity.
+
+Maintenance: Adding a new entity means a push_back of -1 onto each of the K vectors (K push_backs instead of 1), each amortized
+O(1), and each vector might copy itself into a bigger block at a different time. When removing a component, you set it to
+empty (-1) O(1). It does need a reverse lookup or an O(n) search to find which entity got moved into the gap.

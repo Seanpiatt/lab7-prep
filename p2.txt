@@ -1,4 +1,4 @@
-2a. 
-2b. 
-2c. 
-2d. 
+2a. The pattern is std::forward<Args>(args#). It expands to std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), ..., std::forward<ArgN>(argN). N forward calls. 
+2b. The pattern is (f(args#) + 1).It expands to (f(arg1)+1), (f(arg2)+1), (...) , (f(argN)+1). N calls to f with N +1's
+2c. The pattern is Args#.It expands to std::tuple<Arg1, Arg2, ..., ArgN>. The pattern is we get 1 tuple of that form (a specific pattern of Arguments). 1 tuple type with N specific arguments. 
+2d. The pattern is std::vector<Args#>.It expands to std::tuple<std::vector<Arg1>, std::vector<Arg2>, ..., std::vector<ArgN>>. 1 tuple holding N vectors. 
