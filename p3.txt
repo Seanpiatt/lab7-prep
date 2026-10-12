@@ -1,3 +1,10 @@
+Resources:
+  Big-O Cheat Sheet (hash table time complexities): https://www.bigocheatsheet.com/
+  cppreference, std::unordered_map (buckets, rehash, reserve): https://en.cppreference.com/w/cpp/container/unordered_map
+  Boost mailing list, unordered_map node layout: https://lists.preview.boost.org/archives/list/boost-users@lists.preview.boost.org/message/QP6TZ6ZDQW7S3YEN75OGFRRSECUAPCTT
+  Zorba-coders mailing list, hash map vs map overhead: https://archive.lists.launchpad.net/zorba-coders/msg16989.html
+  "Designing a Fast, Efficient, Cache-friendly Hash Table, Step by Step", Matt Kulukundis, CppCon 2017 (YouTube)
+
 Hash table:
 Memory: Each component type map only stores entities that have that specific component. So if an entity does not have
 that component, it does not take up space. However, each entry does take up more bytes than normal.
